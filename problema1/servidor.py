@@ -5,31 +5,50 @@ Objetivo: Crear un servidor TCP que acepte una conexión y intercambie mensajes 
 """
 
 import socket
+def servidor_basico():
 
-# TODO: Definir la dirección y puerto del servidor
+# Definir la dirección y puerto del servidor
+    HOST = 'localhost'  # '127.0.0.1' también funciona
+    PORT = 9999
 
-# TODO: Crear un socket TCP/IP
+# Crear un socket TCP/IP
 # AF_INET: socket de familia IPv4
 # SOCK_STREAM: socket de tipo TCP (orientado a conexión)
+    servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-# TODO: Enlazar el socket a la dirección y puerto especificados
+# Enlazar el socket a la dirección y puerto especificados
+    servidor.bind((HOST, PORT))
 
-# TODO: Poner el socket en modo escucha
+# Poner el socket en modo escucha
 # El parámetro define el número máximo de conexiones en cola
+    servidor.listen(1)
+    print(f"Servidor escuchando en {HOST}:{PORT} ...")
+    print("Servidor a la espera de conexiones ...")
 
-print("Servidor a la espera de conexiones ...")
-
-# TODO: Aceptar una conexión entrante
+# Aceptar una conexión entrante
 # accept() bloquea hasta que llega una conexión
 # conn: nuevo socket para comunicarse con el cliente
 # addr: dirección y puerto del cliente
+    conn, addr = servidor.accept()
+    print(f"Conexión realizada por {addr}")
 
-print(f"Conexión realizada por {addr}")
-
-# TODO: Recibir datos del cliente (hasta 1024 bytes)
- 
-# TODO: Enviar respuesta al cliente (convertida a bytes)
+# Recibir datos del cliente (hasta 1024 bytes)
+    datos = conn.recv(1024)
+    print(f"Mensaje recibido: {datos.decode('utf-8')}")
+    
+# Enviar respuesta al cliente (convertida a bytes)
 # sendall() asegura que todos los datos sean enviados
+    respuesta = "¡Hola, cliente! Mensaje recibido correctamente"
+    conn.sendall(respuesta.encode('utf-8'))
+    print(f"Respuesta enviada: {respuesta}")
 
-# TODO: Cerrar la conexión con el cliente
+# Cerrar la conexión con el cliente
+    conn.close()
+    print("Conexión cerrada")
 
+    servidor.close()
+    print("Servidor finalizado")
+
+if __name__ == "__main__":
+    servidor_basico()
