@@ -13,4 +13,15 @@
 - Manejar archivos grandes con buffers
 - Validar integridad de archivos (checksum)
 - Manejo seguro de rutas de archivos
+____________________________________________________________________________
 
+**Comandos del cliente**:
+- UPLOAD <nombre> <tamaño> <checksum> → Subir archivo
+- DOWNLOAD <nombre> → Descargar archivo
+- LIST → Listar archivos disponibles
+- EXIT → Desconectarse
+
+**Formato de respuestas del servidor**:
+- OK <mensaje>
+- ERROR <mensaje>
+- DATA <tamaño> <checksum> (seguido de los datos binarios)
