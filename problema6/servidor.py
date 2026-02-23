@@ -62,7 +62,7 @@ class ChatClient:
                 room.broadcast(formatted, sender=self)
                 print(formatted)
             else:
-                self.send_message("⚠️ No estás en ninguna sala. Usa /JOIN o /CREATE")
+                self.send_message("No estás en ninguna sala. Usa /JOIN o /CREATE")
     
     def handle_command(self, command):
         """Procesa comandos del cliente"""
@@ -72,17 +72,17 @@ class ChatClient:
         if cmd == '/create' and len(parts) > 1:
             room_name = parts[1]
             if room_name in self.server.rooms:
-                self.send_message(f"❌ La sala '{room_name}' ya existe")
+                self.send_message(f"La sala '{room_name}' ya existe")
             else:
                 self.server.rooms[room_name] = ChatRoom(room_name, self.nickname)
-                self.send_message(f"✅ Sala '{room_name}' creada")
+                self.send_message(f"Sala '{room_name}' creada")
                 # Auto-unirse a la sala creada
                 self.join_room(room_name)
         
         elif cmd == '/join' and len(parts) > 1:
             room_name = parts[1]
             if room_name not in self.server.rooms:
-                self.send_message(f"❌ La sala '{room_name}' no existe. Usa /CREATE o /LIST")
+                self.send_message(f"La sala '{room_name}' no existe. Usa /CREATE o /LIST")
             else:
                 self.join_room(room_name)
         
@@ -96,9 +96,9 @@ class ChatClient:
             if self.current_room:
                 room = self.server.rooms[self.current_room]
                 users = room.get_users()
-                self.send_message(f"👥 Usuarios en '{self.current_room}': {', '.join(users)}")
+                self.send_message(f"Usuarios en '{self.current_room}': {', '.join(users)}")
             else:
-                self.send_message("⚠️ No estás en ninguna sala")
+                self.send_message("No estás en ninguna sala")
         
         elif cmd == '/msg' and len(parts) > 2:
             target = parts[1]
@@ -112,7 +112,7 @@ class ChatClient:
             self.server.remove_client(self)
         
         else:
-            self.send_message("❌ Comando no reconocido. Usa /HELP para ayuda")
+            self.send_message("Comando no reconocido. Usa /HELP para ayuda")
     
     def join_room(self, room_name):
         """Unir a una sala"""
@@ -124,9 +124,9 @@ class ChatClient:
         self.current_room = room_name
         
         # Notificar a la sala
-        welcome = f"✨ {self.nickname} se ha unido a la sala"
+        welcome = f"{self.nickname} se ha unido a la sala"
         room.broadcast(welcome, exclude=self)
-        self.send_message(f"✅ Te has unido a '{room_name}'")
+        self.send_message(f"Te has unido a '{room_name}'")
         
         print(f"{self.nickname} se unió a '{room_name}'")
     
@@ -137,20 +137,20 @@ class ChatClient:
             room.remove_client(self)
             
             # Notificar a la sala
-            goodbye = f"👋 {self.nickname} ha abandonado la sala"
+            goodbye = f"{self.nickname} ha abandonado la sala"
             room.broadcast(goodbye, exclude=self)
             
             # Si la sala queda vacía y no es la sala general, se elimina
             if len(room.clients) == 0 and self.current_room != "general":
                 del self.server.rooms[self.current_room]
-                print(f"🗑️ Sala '{self.current_room}' eliminada (vacía)")
+                print(f"Sala '{self.current_room}' eliminada (vacía)")
             
             self.current_room = None
     
     def list_rooms(self):
         """Lista todas las salas disponibles"""
         if not self.server.rooms:
-            self.send_message("📭 No hay salas disponibles. Usa /CREATE para crear una")
+            self.send_message("No hay salas disponibles. Usa /CREATE para crear una")
             return
         
         rooms_info = []
@@ -159,23 +159,23 @@ class ChatClient:
             creator = room.creator if hasattr(room, 'creator') else "desconocido"
             rooms_info.append(f"  • {name} ({users_count} usuarios) - creada por {creator}")
         
-        self.send_message("📋 Salas disponibles:\n" + "\n".join(rooms_info))
+        self.send_message("Salas disponibles:\n" + "\n".join(rooms_info))
     
     def send_private_message(self, target_nick, message):
         """Envía un mensaje privado a otro usuario"""
         target_client = self.server.find_client_by_nickname(target_nick)
         
         if target_client:
-            formatted = f"🔒 [MP de {self.nickname}]: {message}"
+            formatted = f"[MP de {self.nickname}]: {message}"
             target_client.send_message(formatted)
-            self.send_message(f"🔒 [MP para {target_nick}]: {message}")
+            self.send_message(f"[MP para {target_nick}]: {message}")
         else:
-            self.send_message(f"❌ Usuario '{target_nick}' no encontrado")
+            self.send_message(f"Usuario '{target_nick}' no encontrado")
     
     def show_help(self):
         """Muestra ayuda de comandos"""
         help_text = """
-📚 COMANDOS DISPONIBLES:
+COMANDOS DISPONIBLES:
   /CREATE <sala>   - Crear nueva sala
   /JOIN <sala>     - Unirse a una sala
   /LEAVE           - Salir de la sala actual
@@ -216,7 +216,7 @@ class ChatServer:
                 
                 # Notificar a todos
                 if client.nickname:
-                    print(f"🔌 Cliente {client.nickname} desconectado")
+                    print(f"Cliente {client.nickname} desconectado")
                 
                 del self.clients[client.socket]
                 client.socket.close()
@@ -236,14 +236,14 @@ class ChatServer:
             # Verificar si el nickname ya existe
             with self.lock:
                 if self.find_client_by_nickname(nickname):
-                    client.send_message("❌ Ese nombre ya está en uso. Desconectando...")
+                    client.send_message("Ese nombre ya está en uso. Desconectando...")
                     return
                 
                 client.nickname = nickname
                 self.clients[sock] = client
             
             print(f"✅ Cliente {nickname} conectado desde {addr}")
-            client.send_message(f"✅ Bienvenido {nickname}! Usa /HELP para comandos")
+            client.send_message(f"Bienvenido {nickname}! Usa /HELP para comandos")
             
             # Unir a sala general por defecto
             client.join_room('general')
@@ -277,8 +277,8 @@ class ChatServer:
         server.bind((self.host, self.port))
         server.listen(5)
         
-        print(f"🚀 Servidor de Chat con Salas iniciado en {self.host}:{self.port}")
-        print(f"📁 Sala por defecto: 'general'")
+        print(f"Servidor de Chat con Salas iniciado en {self.host}:{self.port}")
+        print(f"Sala por defecto: 'general'")
         print("Esperando conexiones...\n")
         
         try:
@@ -289,7 +289,7 @@ class ChatServer:
                 thread.start()
                 
         except KeyboardInterrupt:
-            print("\n👋 Servidor detenido por el usuario")
+            print("\nServidor detenido por el usuario")
         finally:
             server.close()
 
