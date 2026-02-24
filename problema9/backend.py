@@ -1,9 +1,9 @@
 """
 Problema 9: Sistema Distribuido - Backend
-✅ Se registra en balanceador
-✅ Envía heartbeats
-✅ Procesa clientes
-✅ Sincroniza datos
+Se registra en balanceador
+Envía heartbeats
+Procesa clientes
+Sincroniza datos
 """
 
 import socket
@@ -35,15 +35,15 @@ class Backend:
         self.server_socket.listen(10)
         self.running = True
         
-        print(f"\n🔧 BACKEND iniciado en puerto {self.my_port}")
+        print(f"\n BACKEND iniciado en puerto {self.my_port}")
         
-        # ✅ REGISTRO: Registrar en balanceador
+        #  REGISTRO: Registrar en balanceador
         if self.register():
-            print(f"✅ Registrado en balanceador {self.balancer_host}:{self.balancer_port}")
+            print(f" Registrado en balanceador {self.balancer_host}:{self.balancer_port}")
         else:
-            print(f"❌ No se pudo registrar")
+            print(f" No se pudo registrar")
         
-        # ✅ HEALTH CHECK: Hilo de heartbeats
+        #  HEALTH CHECK: Hilo de heartbeats
         threading.Thread(target=self.heartbeat_loop, daemon=True).start()
         
         try:
@@ -57,7 +57,7 @@ class Backend:
             self.stop()
     
     def register(self):
-        """✅ REGISTRO: Enviar registro al balanceador"""
+        """ REGISTRO: Enviar registro al balanceador"""
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self.balancer_host, self.balancer_port))
@@ -70,7 +70,7 @@ class Backend:
             return False
     
     def heartbeat_loop(self):
-        """✅ HEALTH CHECK: Enviar heartbeats cada 3 segundos"""
+        """ HEALTH CHECK: Enviar heartbeats cada 3 segundos"""
         while self.running:
             time.sleep(3)
             try:
@@ -79,9 +79,9 @@ class Backend:
                 sock.send(f"HEARTBEAT {self.my_port}\n".encode())
                 sock.recv(1024)  # Recibir respuesta
                 sock.close()
-                print(f"💓 Heartbeat {self.my_port} OK")
+                print(f" Heartbeat {self.my_port} OK")
             except:
-                print(f"⚠️ Heartbeat {self.my_port} falló")
+                print(f" Heartbeat {self.my_port} falló")
     
     def handle_client(self, sock, addr):
         """Maneja peticiones de clientes"""
@@ -90,7 +90,7 @@ class Backend:
             if not data:
                 return
             
-            print(f"📨 Petición en {self.my_port}: {data}")
+            print(f" Petición en {self.my_port}: {data}")
             
             parts = data.split()
             cmd = parts[0].upper()
@@ -110,17 +110,17 @@ class Backend:
                 
                 response = f"OK {key}={value}\n"
                 
-                # ✅ SINCRONIZACIÓN: Notificar al balanceador
+                #  SINCRONIZACIÓN: Notificar al balanceador
                 self.sync_to_balancer(key, value)
                 
             elif cmd == "SYNC" and len(parts) > 2:
-                # ✅ SINCRONIZACIÓN: Recibir datos de otros backends
+                #  SINCRONIZACIÓN: Recibir datos de otros backends
                 key = parts[1]
                 value = ' '.join(parts[2:])
                 with self.lock:
                     self.data_store[key] = value
                 response = f"SYNCED {key}\n"
-                print(f"🔄 Datos sincronizados: {key}={value}")
+                print(f" Datos sincronizados: {key}={value}")
                 
             else:
                 response = "ERROR Comando no reconocido\n"
@@ -133,7 +133,7 @@ class Backend:
             sock.close()
     
     def sync_to_balancer(self, key, value):
-        """✅ SINCRONIZACIÓN: Enviar datos al balanceador"""
+        """ SINCRONIZACIÓN: Enviar datos al balanceador"""
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self.balancer_host, self.balancer_port))
