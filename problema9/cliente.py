@@ -22,9 +22,9 @@ class Client:
             return f"ERROR: {e}"
     
     def run(self):
-        print("="*40)
-        print("📦 CLIENTE SISTEMA DISTRIBUIDO")
-        print("="*40)
+        print("="*10)
+        print(" CLIENTE SISTEMA DISTRIBUIDO")
+        print("="*10)
         print("Comandos: SET clave valor, GET clave, exit")
         
         while True:
